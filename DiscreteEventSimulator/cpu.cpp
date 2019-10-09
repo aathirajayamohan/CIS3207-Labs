@@ -11,6 +11,7 @@ namespace mc
         this->m_eventsPQ = eventsPQ;
         m_occupied = 0;
     }
+
     void Cpu::handleArrival(mc::Globals::Event e)
     {
         // keep track of the max size the queue reaches during the simulation
