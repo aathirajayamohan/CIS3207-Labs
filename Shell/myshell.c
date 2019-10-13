@@ -10,13 +10,15 @@
 
 char error_message[30] = "An error has occured\n";
 // max of 4 paths
-char* paths[4];
+char **paths;
 
 int main()
 {
     char *userInput = malloc(MAX_INPUT_SIZE);
     char* tokens[MAX_INPUT_SIZE];
+    paths = (char**)malloc(MAX_PATH_SIZE * sizeof(char));
 
+    paths[0] = "/bin";
     
     while(1)
     {
@@ -41,16 +43,9 @@ int main()
             numOfArgs++;
         }
 
-
         // check to see if command is a built in one
         if (numOfArgs > 0)
         {
-            // for (int i = 0; i < numOfArgs; i++)
-            // {
-            //     printf("%s ", tokens[i]);
-            // }
-            // puts("");
-
             if (!builtInCommand(tokens, numOfArgs))
             {
                 
@@ -58,7 +53,7 @@ int main()
                 int pid = fork();
                 if (pid < 0)
                 {
-                    puts("fork failed");
+                    write(STDERR_FILENO, error_message, strlen(error_message));
                     exit(1);
                 }
 
@@ -66,23 +61,26 @@ int main()
                 if (pid == 0)
                 {
                     int accessStatus = -1;
+                    char accessPath[40];
+
                     // check if process can run command from path
                     for (int i = 0; i < MAX_PATH_SIZE; i++)
                     {
                         if (paths[i] == NULL) break;
 
-                        char* tempPath1 = strcat(paths[i], "/");
-                        char* tempPath2 = strcat(tempPath1, tokens[0]);
-                        printf("Checking path %s\n", tempPath2);
+                        strcpy(accessPath, paths[i]);
+                        strcat(accessPath, "/");
+                        strcat(accessPath, tokens[0]);
 
-                        accessStatus = access(tempPath2, X_OK);
+                        accessStatus = access(accessPath, X_OK);
                         if (accessStatus == 0)
                         {
                             break;
                         }
+                        // check other paths if they exits
                         else if (accessStatus < 0)
                         {
-                            puts("check other path");
+                            accessPath[0] = '\0';
                         }
                     }
 
@@ -90,14 +88,13 @@ int main()
                     // exit with an error
                     if (accessStatus < 0)
                     {
-                        puts("can't access");
                         write(STDERR_FILENO, error_message, strlen(error_message));
                         exit(1);
                     }
 
                     if (execvp(tokens[0], tokens) < 0)
                     {
-                        perror("Could not execute command");
+                        write(STDERR_FILENO, error_message, strlen(error_message));
                         exit(1);
                     }
                 }
@@ -108,13 +105,14 @@ int main()
                 }
                 
             }
-            
-            
         }
     }
 
     free(userInput);
-    
+    userInput = NULL;
+
+    free(paths);
+    paths = NULL;
     
     return 0;
 }
@@ -133,15 +131,33 @@ int builtInCommand(char* tokens[], int numOfArgs)
         return 1;
     }
     // add a path
-    // fix later
     else if (strcmp(tokens[0], "path") == 0)
     {
-        for (int i = 0; i < 4; i++)
+        if (numOfArgs == 1)
         {
-            if (paths[i] == NULL)
+            // print the current paths
+            for (int i = 0; i < MAX_PATH_SIZE; i++)
             {
-                paths[i] = tokens[1];
-                break;
+                if (paths[i] == NULL) break;
+                printf("%s ", paths[i]);
+            }
+            puts("");
+        }
+        else if (numOfArgs > 1)
+        {
+            // for (int i = 0; i < MAX_PATH_SIZE; i++)
+            // {
+            //     if (i > numOfArgs-1) break;
+            //     //printf("%s\n", tokens[i]);
+                
+            //     paths[i] = tokens[1];
+            // }
+            
+            for (int i = 1; i < numOfArgs; i++)
+            {
+                // printf("before: %s\n", paths[count]);
+                paths[i-1] = tokens[i];
+                // printf("after: %s\n", paths[count-1]);
             }
         }
         return 1;
