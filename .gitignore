@@ -2,5 +2,6 @@
 .idea/
 /cmake-build-debug
 a.out
+.myshell
 .DS_Store
 RUNS.txt
