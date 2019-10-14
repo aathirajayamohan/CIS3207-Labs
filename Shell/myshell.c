@@ -78,12 +78,12 @@ void greeting()
 {
     char* workingPath = NULL;
     char buffer[PATH_MAX + 1];
-
+    
     workingPath = getcwd(buffer, PATH_MAX + 1);
     if (workingPath == NULL)
     {
         printf("myshell> ");
-    } 
+    }
     else
     {
         printf("myshell> ");
@@ -116,7 +116,7 @@ void run(char *userInput)
     
     while (tokens[index] != NULL)
     {
-        if (strcmp(tokens[index], ">") == 0 || strcmp(tokens[index], "<") == 0)
+        if (strcmp(tokens[index], ">") == 0 || strcmp(tokens[index], "<") == 0 || strcmp(tokens[index], ">>") == 0)
             foundInputRedirect = 1;
         else if (strcmp(tokens[index], "&") == 0)
             foundExecInBackground = 1;
@@ -166,7 +166,7 @@ int builtInCommand(char* tokens[], int numOfArgs)
         FILE* fp = NULL;
         
         fp = fopen("readme", "r");
-
+        
         if (fp == NULL)
         {
             // failed to open readme
@@ -179,7 +179,7 @@ int builtInCommand(char* tokens[], int numOfArgs)
             printf("%s", helpFile);
         }
         puts("");
-
+        
         return 1;
     }
     // prints all of the environment variables
@@ -416,7 +416,7 @@ void pipeExec(char* tokens[], int numOfArgs)
         {
             close(fd[0]);
             dup2(fd[1], 1);
-
+            
             if (!builtInCommand(cmd1, numOfArgs))
             {
                 if (execvp(cmd1[0], cmd1) < 0)
@@ -658,7 +658,7 @@ void inputRedirect(char* input[], int numOfArgs)
             close(0);
             dup2(fd, 0);
             close(fd);
-
+            
             if (!builtInCommand(cmd1, numOfArgs))
             {
                 if (execvp(cmd1[0], cmd1) < 0)
@@ -668,7 +668,6 @@ void inputRedirect(char* input[], int numOfArgs)
                     exit(1);
                 }
             }
-            
         }
         else
         {
@@ -678,8 +677,6 @@ void inputRedirect(char* input[], int numOfArgs)
     }
     else if (firstRedirectionType == OUTPUT_APPEND || firstRedirectionType == OUTPUT)
     {
-        
-        printf("output: %s\n", cmdOutput);
         if (firstRedirectionType == OUTPUT_APPEND)
             fd = open(cmdOutput, O_WRONLY | O_CREAT | O_APPEND, S_IRWXU | S_IRWXG | S_IRWXO);
         else
@@ -701,7 +698,6 @@ void inputRedirect(char* input[], int numOfArgs)
                     exit(1);
                 }
             }
-            
         }
         else
         {
@@ -716,3 +712,4 @@ void inputRedirect(char* input[], int numOfArgs)
     cmdInput = NULL;
     cmdOutput = NULL;
 }
+
