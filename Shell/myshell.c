@@ -179,7 +179,7 @@ int builtInCommand(char* tokens[], int numOfArgs)
             printf("%s", helpFile);
         }
         puts("");
-        
+        fclose(fp);
         return 1;
     }
     // prints all of the environment variables
