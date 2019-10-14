@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         {
             // greeting message
             if (!isPaused)
-                printf("myshell> ");
+                greeting();
             fgets(userInput, MAX_INPUT_SIZE, stdin);
             run(userInput);
         }
@@ -72,6 +72,24 @@ int main(int argc, char **argv)
     userInput = NULL;
     
     return 0;
+}
+
+void greeting()
+{
+    char* workingPath = NULL;
+    char buffer[PATH_MAX + 1];
+
+    workingPath = getcwd(buffer, PATH_MAX + 1);
+    if (workingPath == NULL)
+    {
+        printf("myshell> ");
+    } 
+    else
+    {
+        printf("myshell> ");
+        //printf("myshell %s > ", workingPath);
+    }
+    
 }
 
 void run(char *userInput)
@@ -398,13 +416,17 @@ void pipeExec(char* tokens[], int numOfArgs)
         {
             close(fd[0]);
             dup2(fd[1], 1);
-            
-            if (execvp(cmd1[0], cmd1) < 0)
+
+            if (!builtInCommand(cmd1, numOfArgs))
             {
-                // error
-                write(STDERR_FILENO, error_message, strlen(error_message));
-                exit(1);
+                if (execvp(cmd1[0], cmd1) < 0)
+                {
+                    // error
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                    exit(1);
+                }
             }
+            
         }
         else
         {
@@ -424,12 +446,17 @@ void pipeExec(char* tokens[], int numOfArgs)
         {
             close(fd[1]);
             dup2(fd[0], 0);
-            if (execvp(cmd2[0], cmd2) < 0)
+            
+            if (!builtInCommand(cmd2, numOfArgs))
             {
-                // error
-                write(STDERR_FILENO, error_message, strlen(error_message));
-                exit(1);
+                if (execvp(cmd2[0], cmd2) < 0)
+                {
+                    // error
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                    exit(1);
+                }
             }
+            
         }
         else
         {
@@ -507,11 +534,15 @@ void backgroundExec(char* tokens[], int numOfArgs)
                     exit(1);
                 }
                 
-                if (execvp(cmd[0], cmd) < 0)
+                if (!builtInCommand(cmd, numOfCmdArgs))
                 {
-                    write(STDERR_FILENO, error_message, strlen(error_message));
-                    exit(1);
+                    if (execvp(cmd[0], cmd) < 0)
+                    {
+                        write(STDERR_FILENO, error_message, strlen(error_message));
+                        exit(1);
+                    }
                 }
+                
             }
             // parent process
             else
@@ -628,12 +659,16 @@ void inputRedirect(char* input[], int numOfArgs)
             dup2(fd, 0);
             close(fd);
 
-            if (execvp(cmd1[0], cmd1) < 0)
+            if (!builtInCommand(cmd1, numOfArgs))
             {
-                // error
-                write(STDERR_FILENO, error_message, strlen(error_message));
-                exit(1);
+                if (execvp(cmd1[0], cmd1) < 0)
+                {
+                    // error
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                    exit(1);
+                }
             }
+            
         }
         else
         {
@@ -657,12 +692,16 @@ void inputRedirect(char* input[], int numOfArgs)
             dup2(fd, 1);
             close(fd);
             
-            if (execvp(cmd1[0], cmd1) < 0)
+            if (!builtInCommand(cmd1, numOfArgs))
             {
-                // error
-                write(STDERR_FILENO, error_message, strlen(error_message));
-                exit(1);
+                if (execvp(cmd1[0], cmd1) < 0)
+                {
+                    // error
+                    write(STDERR_FILENO, error_message, strlen(error_message));
+                    exit(1);
+                }
             }
+            
         }
         else
         {

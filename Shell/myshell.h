@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <limits.h>
 
 
 #define MAX_INPUT_SIZE 40
@@ -26,6 +27,7 @@ enum input_redirection_type
     OUTPUT_APPEND
 };
 
+void greeting();
 void run(char *userInput);
 int builtInCommand(char* tokens[], int numOfArgs);
 void execCommand(char* tokens[], int numOfArgs, int execInBackground);
