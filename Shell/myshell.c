@@ -144,9 +144,24 @@ int builtInCommand(char* tokens[], int numOfArgs)
     }
     else if (strcmp(tokens[0], "help") == 0)
     {
-        //FILE* fp;
+        char* helpFile = malloc(1510 * sizeof(char*));
+        FILE* fp = NULL;
         
+        fp = fopen("readme", "r");
+
+        if (fp == NULL)
+        {
+            // failed to open readme
+            write(STDERR_FILENO, error_message, strlen(error_message));
+            //exit(1);
+        }
         
+        while (fgets(helpFile, MAX_INPUT_SIZE, (FILE*)fp))
+        {
+            printf("%s", helpFile);
+        }
+        puts("");
+
         return 1;
     }
     // prints all of the environment variables
@@ -366,10 +381,7 @@ void pipeExec(char* tokens[], int numOfArgs)
     
     // file descriptor for reading and input
     int fd[2];
-    
     int pid;
-    //int pid2;
-    // WRITE = 1    READ =0
     
     // pipe created without error
     if (pipe(fd) == 0)
@@ -400,7 +412,6 @@ void pipeExec(char* tokens[], int numOfArgs)
             waitpid(pid, NULL, 0);
         }
         
-        
         pid = fork();
         if (pid < 0)
         {
@@ -426,11 +437,7 @@ void pipeExec(char* tokens[], int numOfArgs)
             close(fd[1]);
             waitpid(pid, NULL, 0);
         }
-        
-        
     }
-    
-    
 }
 
 void backgroundExec(char* tokens[], int numOfArgs)
@@ -594,10 +601,6 @@ void inputRedirect(char* input[], int numOfArgs)
     }
     
     // file descriptor
-    // to be restore later
-    int tempIn = dup(0);
-    int tempOut = dup(1);
-    
     int fd;
     int fdOut;
     int pid;
@@ -621,11 +624,10 @@ void inputRedirect(char* input[], int numOfArgs)
                 dup2(fdOut, 1);
                 close(fdOut);
             }
-            close(FD_READ);
+            close(0);
             dup2(fd, 0);
             close(fd);
-            
-            
+
             if (execvp(cmd1[0], cmd1) < 0)
             {
                 // error
@@ -651,7 +653,7 @@ void inputRedirect(char* input[], int numOfArgs)
         pid = fork();
         if (pid == 0)
         {
-            close(FD_WRITE);
+            close(1);
             dup2(fd, 1);
             close(fd);
             

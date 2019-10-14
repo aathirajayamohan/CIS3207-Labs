@@ -9,8 +9,6 @@
 
 #define MAX_INPUT_SIZE 40
 #define MAX_PATH_SIZE 4
-#define FD_READ 0
-#define FD_WRITE 1
 
 extern char **environ;
 
