@@ -1,11 +1,11 @@
 #ifndef SERVER_H
 #define SERVER_H
 
-#define DEFAULT_DICTIONARY "words.txt"
+#define DEFAULT_DICTIONARY "dictionary.txt"
 #define DEFAULT_PORT 8888
 #define MAX_NUMBER_OF_WORKERS 5
 #define MAX_QUEUE_SIZE 5
-#define MAX_WORD_SIZE 512
+#define MAX_WORD_SIZE 1024
 #define INITIAL_DICTIONARY_SIZE 5000
 #define DELIMS " \r\n.?!,"
 
