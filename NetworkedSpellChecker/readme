@@ -1,0 +1,11 @@
+Matthew Cohen
+Networked Spell Checker Lab
+
+The purpose of this project is to create a program that provides multi-threading capabilities
+that accepts connections from various clients without waiting for the previous client to
+disconnect. The program can be executed without any arguments provided, in which case the
+default dictionary file and port 8888 with be used to start the server. 
+
+To use a custom port, simply enter a valid port number. To change the dictionary file to use,
+specify the file to use. Both arguments can be passed to the program at the same time. Order
+does not matter.
