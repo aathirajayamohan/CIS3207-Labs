@@ -1,12 +1,3 @@
-
-// Program outline
-// clients connects to the server
-// clients send a word to the server
-// the server checks if the word is spelled correctly or not
-// the server responds to the client telling it whether the word is spelled correctly or not
-// repeat until the client disconnects
-
-
 #include "server.h"
 
 
@@ -215,12 +206,13 @@ void* workerThreadEntry(void* param)
         // read the message from the client
         read(*client, buffer, MAX_WORD_SIZE);
 
-        char* response = strtok(buffer, DELIMS);
+        char* response = strtok(buffer, TOKEN_SEPERATORS);
         // try to read all of the words until MAX_WORD_SIZE is reached to prevent an overflow
         while (response != NULL)
         {
             // holds a single word and if it was spelled correctly
             char* temp = malloc(sizeof(char) * 100);
+            char* clientMsg = malloc(sizeof(char) * 100);
 
             strcpy(temp, response);
             if (checkWord(response))
@@ -228,24 +220,30 @@ void* workerThreadEntry(void* param)
                 // word was spelled correctly
                 strcat(temp, ",OK");
             }
-             else
-             {
-                 // word was spelled incorrectly or isn't in the dictionary
-                 strcat(temp, ",MISSPELLED");
-             }
+            else
+            {
+                // word was spelled incorrectly or isn't in the dictionary
+                strcat(temp, ",MISSPELLED");
+            }
 
             pthread_mutex_lock(&loggerMutex);
             addToQueue(&logQueue, temp);
             pthread_mutex_unlock(&loggerMutex);
 
+            // send results to the client
+            strcpy(clientMsg, temp);
+            strcat(clientMsg, "\n");
+            send(*client, clientMsg, strlen(clientMsg), 0);
+
             // there is at least one message in the logger queue to be handled
             pthread_cond_signal(&logQueue.fill);
 
             // look for anymore words from the response
-            response = strtok(NULL, DELIMS);
+            response = strtok(NULL, TOKEN_SEPERATORS);
         }
 
         // close the client socket and free up any memory
+        shutdown(*client, SHUT_RDWR);
         close(*client);
         free(client);
     }

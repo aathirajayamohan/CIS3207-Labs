@@ -7,7 +7,7 @@
 #define MAX_QUEUE_SIZE 5
 #define MAX_WORD_SIZE 1024
 #define INITIAL_DICTIONARY_SIZE 5000
-#define DELIMS " \r\n.?!,"
+#define TOKEN_SEPERATORS " \r\n.?!,"
 
 #include <pthread.h>
 #include <sys/socket.h>
