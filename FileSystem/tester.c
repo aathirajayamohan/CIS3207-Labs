@@ -7,9 +7,15 @@ int main()
 	// copy a file from real OS
 	// copy a file from virtual to real OS
 	// show contents of virtual disk
+	char* diskName = "filesys";
+	
+	if (make_fs(diskName) < 0)
+		return -1;
+	
+	if (mount_fs(diskName) < 0)
+		return -1;
 
-	printf("tester\n");
-	fs_create("/root/dog");
+	
 
 	return 0;
 }

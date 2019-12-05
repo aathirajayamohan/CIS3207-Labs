@@ -22,7 +22,6 @@ void create_root()
 
 	// set the create time
 	set_meta_time(&testDir, 0);
-	printf("root size is: %ld\n", sizeof(testDir));
 
 	// add entry to FAT
 	// used two entries in FAT
@@ -123,16 +122,6 @@ int mount_fs(char *disk_name)
 		return -1;
 	}
 
-	
-	printf("fat: %d\n", fTable[0]);
-
-	// test print dir
-	DirectoryEntry test2;
-	memcpy(&test2, &dirTable[0], sizeof(DirectoryEntry));
-	printf("Fat free entry: %d\n", nextFreeFATIndex());
-	//printf("dir create date: %s\n", test2.createdDate);
-	//printf("dir create time: %s\n", test2.createdTime);
-	// if the program made it this far then the disk was mounted successfully
 	return 0;
 }
 

@@ -12,7 +12,7 @@
 #include "disk.h"
 
 
-#define DEBUG 1
+#define DEBUG 0
 #define MAX_FILE_NAME_SIZE 15
 #define MAX_AMOUNT_OF_FILES 256
 #define MAX_FILE_DESCRIPTORS 64
